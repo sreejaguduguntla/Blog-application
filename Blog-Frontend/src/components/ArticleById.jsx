@@ -32,6 +32,8 @@ function ArticleByID() {
   const [newComment, setNewComment] = useState("");
   const [postingComment, setPostingComment] = useState(false);
 
+  const BASE_URL = "https://blog-application-odq4.onrender.com";
+
   useEffect(() => {
     if (article) return;
 
@@ -39,7 +41,10 @@ function ArticleByID() {
       setLoading(true);
 
       try {
-        const res = await axios.get(`http://localhost:4000/user-api/article/${id}`, { withCredentials: true });
+        const res = await axios.get(
+          `${BASE_URL}/user-api/article/${id}`,
+          { withCredentials: true }
+        );
 
         setArticle(res.data.payload);
       } catch (err) {
@@ -64,14 +69,17 @@ function ArticleByID() {
   const toggleArticleStatus = async () => {
     const newStatus = !article.isArticleActive;
 
-    const confirmMsg = newStatus ? "Restore this article?" : "Delete this article?";
+    const confirmMsg = newStatus
+      ? "Restore this article?"
+      : "Delete this article?";
+
     if (!window.confirm(confirmMsg)) return;
 
     try {
       const res = await axios.patch(
-        `http://localhost:4000/author-api/articles/${id}/status`,
+        `${BASE_URL}/author-api/articles/${id}/status`,
         { isArticleActive: newStatus },
-        { withCredentials: true },
+        { withCredentials: true }
       );
 
       console.log("SUCCESS:", res.data);
@@ -85,13 +93,13 @@ function ArticleByID() {
       const msg = err.response?.data?.message;
 
       if (err.response?.status === 400) {
-        toast(msg); // already deleted/active case
+        toast(msg);
       } else {
         setError(msg || "Operation failed");
       }
     }
   };
-  
+
   const editArticle = (articleObj) => {
     navigate("/edit-article", { state: articleObj });
   };
@@ -113,17 +121,27 @@ function ArticleByID() {
 
     try {
       const userId = user._id || user.id || user.userId;
+
       const res = await axios.put(
-        "http://localhost:4000/user-api/articles",
-        { user: userId, articleId: id, comment: newComment.trim() },
-        { withCredentials: true },
+        `${BASE_URL}/user-api/articles`,
+        {
+          user: userId,
+          articleId: id,
+          comment: newComment.trim(),
+        },
+        { withCredentials: true }
       );
 
       setArticle(res.data.payload);
       setNewComment("");
+
       toast.success("Comment added successfully");
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || "Could not add comment";
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Could not add comment";
+
       toast.error(msg);
       setError(msg);
     } finally {
@@ -141,10 +159,15 @@ function ArticleByID() {
       <div className={articleHeader}>
         <span className={articleCategory}>{article.category}</span>
 
-        <h1 className={`${articleMainTitle} uppercase`}>{article.title}</h1>
+        <h1 className={`${articleMainTitle} uppercase`}>
+          {article.title}
+        </h1>
 
         <div className={articleAuthorRow}>
-          <div className={authorInfo}>✍️ {article.author?.firstName || "Author"}</div>
+          <div className={authorInfo}>
+            ✍️ {article.author?.firstName || "Author"}
+          </div>
+
           <div>{formatDate(article.createdAt)}</div>
         </div>
       </div>
@@ -160,7 +183,10 @@ function ArticleByID() {
           <div className="space-y-3 mb-4">
             {article.comments.map((c, idx) => (
               <div key={idx} className="p-3 rounded border bg-white">
-                <p className="text-sm text-gray-800">{c.comment}</p>
+                <p className="text-sm text-gray-800">
+                  {c.comment}
+                </p>
+
                 <p className="text-xs text-gray-500 mt-1">
                   by {c.user?.firstName || c.user?.email || c.user || "Unknown"}
                 </p>
@@ -168,7 +194,9 @@ function ArticleByID() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-600 mb-4">No comments yet. Be the first to share your thoughts!</p>
+          <p className="text-sm text-gray-600 mb-4">
+            No comments yet. Be the first to share your thoughts!
+          </p>
         )}
 
         {user?.role === "USER" ? (
@@ -180,6 +208,7 @@ function ArticleByID() {
               rows={3}
               placeholder="Write a comment..."
             />
+
             <div className="flex justify-end">
               <button
                 type="submit"
@@ -191,26 +220,35 @@ function ArticleByID() {
             </div>
           </form>
         ) : (
-          <p className="text-xs text-gray-500">Login as USER to add comments.</p>
+          <p className="text-xs text-gray-500">
+            Login as USER to add comments.
+          </p>
         )}
       </div>
 
       {/* AUTHOR actions */}
       {user?.role === "AUTHOR" && (
         <div className={articleActions}>
-          <button className={editBtn} onClick={() => editArticle(article)}>
+          <button
+            className={editBtn}
+            onClick={() => editArticle(article)}
+          >
             Edit
           </button>
 
-          <button className={deleteBtn} onClick={toggleArticleStatus}>
+          <button
+            className={deleteBtn}
+            onClick={toggleArticleStatus}
+          >
             {article.isArticleActive ? "Delete" : "Restore"}
           </button>
         </div>
       )}
-      {/* form to add comment if role is USER */}
 
       {/* Footer */}
-      <div className={articleFooter}>Last updated: {formatDate(article.updatedAt)}</div>
+      <div className={articleFooter}>
+        Last updated: {formatDate(article.updatedAt)}
+      </div>
     </div>
   );
 }
