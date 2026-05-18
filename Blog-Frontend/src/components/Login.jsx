@@ -1,69 +1,98 @@
 import { useForm } from "react-hook-form";
-import {useAuth} from "../store/authStore"
-import { useNavigate } from "react-router-dom";
+import {
+  pageBackground,
+  formCard,
+  formTitle,
+  formGroup,
+  labelClass,
+  inputClass,
+  submitBtn,
+  errorClass,
+  mutedText,
+  divider,
+  linkClass,
+} from "../styles/common";
+import { NavLink } from "react-router";
+import { useAuth } from "../store/authStore";
 import { useEffect } from "react";
-import {toast} from "react-hot-toast"
-export default function Login(){
+import { useNavigate,useLocation } from "react-router";
+import { toast } from "react-hot-toast";
 
-  const {register,handleSubmit,formState:{errors}} = useForm();
-  const Navigate = useNavigate() //why?
-  const login = useAuth(state=>state.login)
-  const currentUser = useAuth(state=>state.currentUser)
-  const isAuthenticated = useAuth(state=>state.isAuthenticated)
-  const onSubmit= async(userCredObj)=>{
-    await login(userCredObj)
-    console.log("isAuthenticated ", isAuthenticated)
- }
- useEffect(()=>{
-  if(isAuthenticated && currentUser){
-    if(currentUser.role === "USER"){
-      Navigate('/userprofile')
+function Login() {
+  const { register, handleSubmit } = useForm();
+  const login = useAuth((state) => state.login);
+  const isAuthenticated = useAuth((state) => state.isAuthenticated);
+  const currentUser = useAuth((state) => state.currentUser);
+  const error = useAuth((state) => state.error);
+  const navigate = useNavigate();
+  const location=useLocation()
+
+
+  // console.log("Is Authenticated :", isAuthenticated);
+  // console.log("Current usr", currentUser);
+  // console.log("error is ", error);
+  const onUserLogin = async (userCredObj) => {
+    await login(userCredObj);
+  };
+
+ 
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (location.pathname === "/login") {
+        if (currentUser.role === "USER") {
+          toast.success("Loggedin successfully");
+          navigate("/user-profile");
+        } else if (currentUser.role === "AUTHOR") {
+          navigate("/author-profile");
+        }
+      }
     }
-    else if(currentUser.role === "AUTHOR"){
-      Navigate('/authorprofile')
-    }
-  }
- },[isAuthenticated, currentUser, Navigate])
- return(
+  }, [isAuthenticated, currentUser]);
 
-  <div className="bg-gray-100 min-h-screen flex justify-center items-center">
+  return (
+    <div className={`${pageBackground} flex items-center justify-center py-16 px-4`}>
+      <div className={formCard}>
+        {/* Title */}
+        <h2 className={formTitle}>Sign In</h2>
 
-   <form
-    onSubmit={handleSubmit(onSubmit)}
-    className="bg-white p-8 rounded shadow-md w-96 flex flex-col items-center"
-   >
+        {/* error message */}
+        {error && <p className={errorClass}>{error}</p>}
+        <form onSubmit={handleSubmit(onUserLogin)}>
+          {/* Email */}
+          <div className={formGroup}>
+            <label className={labelClass}>Email</label>
+            <input type="email" {...register("email")} placeholder="you@example.com" className={inputClass} />
+          </div>
 
-    <h2 className="text-xl mb-4 font-semibold">Login</h2>
+          {/* Password */}
+          <div className={formGroup}>
+            <label className={labelClass}>Password</label>
+            <input type="password" {...register("password")} placeholder="••••••••" className={inputClass} />
+          </div>
 
-    <p className="text-red-500 text-sm mb-2">{errors.role?.message}</p>
+          {/* Forgot password */}
+          <div className="text-right -mt-2 mb-4">
+            <a href="/forgot-password" className={`${linkClass} text-xs`}>
+              Forgot password?
+            </a>
+          </div>
 
-    {/* Email */}
-    <input
-     type="email"
-     placeholder="Email"
-     className="border p-2 w-72 mb-1 bg-gray-200 rounded"
-     {...register("email",{required:"Email is required"})}
-    />
+          {/* Submit */}
+          <button type="submit" className={submitBtn}>
+            Sign In
+          </button>
+        </form>
 
-    <p className="text-red-500 text-sm mb-2">{errors.email?.message}</p>
-
-    {/* Password */}
-    <input
-     type="password"
-     placeholder="Password"
-     className="border p-2 w-72 mb-1 bg-gray-200 rounded"
-     {...register("password",{required:"Password required",minLength:{value:6,message:"Minimum 6 characters"}})}
-    />
-
-    <p className="text-red-500 text-sm mb-3">{errors.password?.message}</p>
-
-    {/* Button */}
-    <button className="bg-blue-400 text-white px-6 py-2 rounded hover:bg-blue-600">
-     Login
-    </button>
-
-   </form>
-
-  </div>
- )
+        {/* Footer note */}
+        <p className={`${mutedText} text-center mt-5`}>
+          Don't have an account?{" "}
+          <NavLink to="/register" className={linkClass}>
+            Create one
+          </NavLink>
+        </p>
+      </div>
+    </div>
+  );
 }
+
+export default Login;

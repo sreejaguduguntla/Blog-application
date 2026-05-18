@@ -1,77 +1,109 @@
-import React from "react"
-import axios from "axios"
-import { useAuth } from "../store/authStore"
-import { useNavigate } from "react-router-dom"
-import {articleGrid, articleCardClass, articleTitle, articleBody, tagClass} from "../styles/common"
+import { useAuth } from "../store/authStore";
+import { useNavigate } from "react-router";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-export default function UserProfile() {
+import {
+  articleGrid,
+  articleCardClass,
+  articleTitle,
+  articleBody,
+  ghostBtn,
+  loadingClass,
+  errorClass,
+  timestampClass,
+} from "../styles/common.js";
 
-  const navigate = useNavigate()
-  const logout = useAuth(state => state.logout)
+function UserProfile() {
+  const logout = useAuth((state) => state.logout);
+  const currentUser = useAuth((state) => state.currentUser);
+  const navigate = useNavigate();
+  //console.log("currentUser in profile",currentUser)
 
-  const [articles, setArticles] = React.useState([])
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [articles, setArticles] = useState([]);
 
-  // fetch all articles
-  React.useEffect(() => {
-    async function getArticles() {
+  useEffect(() => {
+    const getArticles = async () => {
+      setLoading(true);
       try {
+        const res = await axios.get("http://localhost:4000/user-api/articles", { withCredentials: true });
 
-        let res = await axios.get(
-          "http://localhost:4000/user-api/articles", { withCredentials: true }
-        )
-
-        setArticles(res.data.payload || [])
-
+        setArticles(res.data.payload);
       } catch (err) {
-        console.log(err)
+        setError(err.response?.data?.error || "Something went wrong");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    getArticles()
+    getArticles();
+  }, []);
 
-  }, [])
+  // convert UTC → IST
+  const formatDateIST = (date) => {
+    return new Date(date).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
 
   const onLogout = async () => {
-    await logout()
-    navigate("/login")
+    await logout();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
+
+  const navigateToArticleByID = (articleObj) => {
+    navigate(`/article/${articleObj._id}`, {
+      state: articleObj,
+    });
+  };
+
+  if (loading) {
+    return <p className={loadingClass}>Loading articles...</p>;
   }
 
   return (
-    <div className="p-5">
+    <div>
+      {error && <p className={errorClass}>{error}</p>}
 
-      {articles.length === 0 ? (
-        <h2 className="mt-5 text-xl">No articles available</h2>
-      ) : (
+      <div className="text-end">
+        <p className="text-2xl"> Welcome,{currentUser?.firstName}</p>
+        <img src={currentUser?.profileImageUrl} className="w-14 mr-2 rounded-full block ms-auto" alt="" />
+      </div>
+      <div className="flex justify-end mb-6 mt-3">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={onLogout}>
+          Logout
+        </button>
+      </div>
 
-        <div className={articleGrid}>
+      <div className={articleGrid}>
+        {articles.map((articleObj) => (
+          <div className={articleCardClass} key={articleObj._id}>
+            <div className="flex flex-col h-full">
+              {/* Top Content */}
+              <div>
+                <p className={articleTitle}>{articleObj.title}</p>
 
-          {articles.map((article) => (
-            <div
-              key={article._id}
-              className={articleCardClass}
-            >
+                <p>{articleObj.content.slice(0, 20)}...</p>
 
-              <h3 className={articleTitle}>
-                {article.title}
-              </h3>
+                <p className={timestampClass}>{formatDateIST(articleObj.createdAt)}</p>
+              </div>
 
-              <p className={articleBody}>
-                {article.content}
-              </p>
-              <button className={tagClass} >
-                Read Article
+              {/* Button at bottom */}
+              <button className={`${ghostBtn} mt-auto pt-4`} onClick={() => navigateToArticleByID(articleObj)}>
+                Read Article →
               </button>
-
             </div>
-          ))}
-        </div>
-      )}
-      <button
-            onClick={onLogout}
-            className="bg-red-400 text-white px-4 py-2 rounded mt-10"
-          >
-            Logout
-      </button>
+          </div>
+        ))}
+      </div>
     </div>
-  )
+  );
 }
+
+export default UserProfile;

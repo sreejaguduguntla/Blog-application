@@ -1,153 +1,205 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import {
+  pageBackground,
+  formCard,
+  formTitle,
+  formGroup,
+  labelClass,
+  inputClass,
+  submitBtn,
+  errorClass,
+  mutedText,
+  divider,
+  loadingClass,
+} from "../styles/common";
+import { NavLink } from "react-router";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { loadingClass } from "../styles/common";
+import { useNavigate } from "react-router";
 
-export default function Register() {
-
-  const navigate = useNavigate();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm();
-
+function Register() {
+  const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const navigate = useNavigate();
+  //const []=useState()
 
-  const onSubmit = async (newUser) => {
-
+  const onUserRegister = async (newUser) => {
     setLoading(true);
-    setError("");
 
+    // Create form data object
+    const formData = new FormData();
+    //get user object
+    let { role, profileImageUrl, ...userObj } = newUser;
+    console.log("role", role);
+    console.log("profileImageUrl", profileImageUrl);
+    //add all fields except profilePic to FormData object
+    Object.keys(userObj).forEach((key) => {
+      formData.append(key, userObj[key]);
+    });
+    // add profilePic to Formdata object
+    formData.append("profileImageUrl", profileImageUrl[0]);
+    //add image to formData objecte
     try {
-
-      let { role, ...userObj } = newUser;
-      if (!userObj.profileImageUrl) {
-        userObj.profileImageUrl = "";
+      if (role === "user") {
+        //make API req to user-api
+        let resObj = await axios.post("http://localhost:4000/user-api/users", formData);
+        if (resObj.status === 201) {
+          //navigate to login
+          navigate("/login");
+        }
       }
-
-      let url = role === "USER" ? "http://localhost:4000/user-api/users" : "http://localhost:4000/author-api/users";
-
-      let resObj = await axios.post(url, userObj);
-
-      if (resObj.status === 201) {
-        navigate("/login");
+      if (role === "author") {
+        //make API req to author-api
+        //make API req to user-api
+        let resObj = await axios.post("http://localhost:4000/author-api/users", formData);
+        console.log("res obj is ", resObj);
+        if (resObj.status === 201) {
+          //navigate to login
+          navigate("/login");
+        }
       }
-
     } catch (err) {
-      console.log(err.response?.data);
-      setError("Registration failed. Please try again.");
+      // console.log("err is ", err);
+      setError(err.response?.data?.error || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // loading screen
+  //cleanup(remove preview image from browser memory)
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  //loading
   if (loading === true) {
-    return <p className={loadingClass}>Loading...</p>;
+    return <p className={loadingClass}></p>;
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen flex justify-center items-center">
+    <div className={`${pageBackground} flex items-center justify-center py-16 px-4`}>
+      <div className={formCard}>
+        {/* Title */}
+        <h2 className={formTitle}>Create an Account</h2>
+        {/* error message */}
+        {error && <p className={errorClass}>{error}</p>}
+        <form onSubmit={handleSubmit(onUserRegister)}>
+          {/* Role Selection */}
+          <div className="mb-5">
+            <p className={labelClass}>Register as</p>
+            <div className="flex gap-6 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  {...register("role")}
+                  id="user"
+                  value="user"
+                  className="accent-violet-600 w-4 h-4"
+                />
+                <span className="text-sm text-stone-700 font-medium">User</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  {...register("role")}
+                  id="author"
+                  value="author"
+                  className="accent-violet-600 w-4 h-4"
+                />
+                <span className="text-sm text-stone-700 font-medium">Author</span>
+              </label>
+            </div>
+          </div>
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white p-8 rounded shadow-md w-96 flex flex-col items-center"
-      >
+          <div className={divider} />
 
-        <h2 className="text-xl mb-4 font-semibold">Register</h2>
+          {/* First & Last Name — side by side */}
+          <div className="sm:flex gap-4 mb-4">
+            <div className="flex-1">
+              <label className={labelClass}>First Name</label>
+              <input type="text" {...register("firstName")} placeholder="First name" className={inputClass} />
+            </div>
+            <div className="flex-1">
+              <label className={labelClass}>Last Name</label>
+              <input type="text" {...register("lastName")} placeholder="Last name" className={inputClass} />
+            </div>
+          </div>
 
-        {/* Role */}
-        <div className="mb-4 flex items-center gap-3">
-          <span>Select Role</span>
+          {/* Email */}
+          <div className={formGroup}>
+            <label className={labelClass}>Email</label>
+            <input type="email" {...register("email")} placeholder="you@example.com" className={inputClass} />
+          </div>
 
-          <label>
-            <input type="radio" value="USER" {...register("role", { required: "Role required" })} />
-            <span className="ml-1">User</span>
-          </label>
+          {/* Password */}
+          <div className={formGroup}>
+            <label className={labelClass}>Password</label>
+            <input type="password" {...register("password")} placeholder="Min. 8 characters" className={inputClass} />
+          </div>
 
-          <label>
+          {/* Profile Image URL */}
+          <div className={formGroup}>
+            <label className={labelClass}>Profile Image URL</label>
             <input
-              type="radio"
-              value="AUTHOR"
-              {...register("role", { required: "Role required" })}
+              type="file"
+              accept="image/png, image/jpeg"
+              {...register("profileImageUrl")}
+              onChange={(e) => {
+                //get image file
+                const file = e.target.files[0];
+                // validation for image format
+                if (file) {
+                  if (!["image/jpeg", "image/png"].includes(file.type)) {
+                    setError("Only JPG or PNG allowed");
+                    return;
+                  }
+                  //validation for file size
+                  if (file.size > 2 * 1024 * 1024) {
+                    setError("File size must be less than 2MB");
+                    return;
+                  }
+                  //Converts file → temporary browser URL(create preview URL)
+                  const previewUrl = URL.createObjectURL(file);
+                  setPreview(previewUrl);
+                  setError(null);
+                }
+              }}
             />
-            <span className="ml-1">Author</span>
-          </label>
-        </div>
 
-        <p className="text-red-500 text-sm mb-2">{errors.role?.message}</p>
+            {preview && (
+              <div className="mt-3 flex justify-center">
+                <img src={preview} alt="Preview" className="w-24 h-24 object-cover rounded-full border" />
+              </div>
+            )}
+          </div>
 
-        {/* Error Message */}
-        {error && (
-          <p className="text-red-500 mb-2">{error}</p>
-        )}
+          {/* Submit */}
+          <button type="submit" className={submitBtn}>
+            Create Account
+          </button>
+        </form>
 
-        {/* First & Last Name */}
-        <div className="flex gap-3 mb-1">
-
-          <input
-            type="text"
-            placeholder="First Name"
-            className="border p-2 w-32 bg-gray-200 rounded"
-            {...register("firstName", { required: "First name required" })}
-          />
-
-          <input
-            type="text"
-            placeholder="Last Name"
-            className="border p-2 w-32 bg-gray-200 rounded"
-            {...register("lastName")}
-          />
-
-        </div>
-
-        <p className="text-red-500 text-sm mb-2">{errors.firstName?.message}</p>
-
-        {/* Email */}
-        <input
-          type="email"
-          placeholder="Email"
-          className="border p-2 w-72 mb-1 bg-gray-200 rounded"
-          {...register("email", { required: "Email required" })}
-        />
-
-        <p className="text-red-500 text-sm mb-2">{errors.email?.message}</p>
-
-        {/* Password */}
-        <input
-          type="password"
-          placeholder="Password"
-          className="border p-2 w-72 mb-1 bg-gray-200 rounded"
-          {...register("password", {
-            required: "Password required",
-            minLength: {
-              value: 6,
-              message: "Minimum 6 characters"
-            }
-          })}
-        />
-
-        <p className="text-red-500 text-sm mb-2">{errors.password?.message}</p>
-
-        {/* Optional Profile Image URL */}
-        <input
-          type="text"
-          placeholder="Profile Image URL (optional)"
-          className="border p-2 w-72 mb-3 bg-gray-200 rounded"
-          {...register("profileImageUrl")}
-        />
-
-        {/* Register Button */}
-        <button className="bg-blue-400 text-white px-6 py-2 rounded hover:bg-blue-600">
-          Create Account
-        </button>
-
-      </form>
-
+        {/* Footer note */}
+        <p className={`${mutedText} text-center mt-5`}>
+          Already have an account?{" "}
+          <NavLink to="/login" className="text-violet-600 hover:text-violet-500 font-medium">
+            Sign in
+          </NavLink>
+        </p>
+      </div>
     </div>
   );
 }
+
+export default Register;
+
+//res.data
+//err.response.
+
+//append(fn,userObj.profileImageUrl)
