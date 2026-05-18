@@ -2,7 +2,7 @@ import exp from "express";
 import { authenticate } from "../services/authService.js";
 import { UserTypeModel } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/temp.js";
 export const commonRouter = exp.Router();
 
 //login
