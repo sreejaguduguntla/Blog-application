@@ -1,9 +1,9 @@
 import exp from "express";
 import { connect } from "mongoose";
 import { config } from "dotenv";
-import { userRoute } from "./APIs/UserAPI.js";
+import { userRoute } from "./APIs/userAPI.js";
 import cookieParser from "cookie-parser";
-import { adminRoute } from "./APIs/AdminAPI.js";
+import { adminRoute } from "./APIs/adminAPI.js";
 import { authorRoute } from "./APIs/authorAPI.js";
 import { commonRouter } from "./APIs/commonAPI.js";
 import cors from "cors";
