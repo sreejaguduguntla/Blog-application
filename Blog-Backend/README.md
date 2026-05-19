@@ -184,3 +184,23 @@ Backend deployed using:
 Database hosted on:
 
 - MongoDB Atlas
+
+---
+
+# What I Learned
+
+- Backend API architecture
+- REST API development
+- MongoDB Atlas integration
+- JWT Authentication
+- Cookie-based authorization
+- Middleware implementation
+- CORS handling
+- Backend deployment
+- Production authentication handling
+
+---
+
+# Backend Author Note
+
+This backend was built as part of a MERN Stack learning project by a 3rd year CSE undergraduate student to practice backend development, authentication systems, database integration, and cloud deployment workflows.
