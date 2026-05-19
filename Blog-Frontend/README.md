@@ -153,3 +153,22 @@ npm run lint
 - Toast notifications
 - Protected navigation
 - Modern dashboard layouts
+
+---
+
+# What I Learned
+
+- React component architecture
+- State management using Zustand
+- Routing and navigation
+- API integration
+- Authentication handling
+- Protected routes
+- Frontend deployment
+- Responsive UI development
+
+---
+
+# Frontend Author Note
+
+This frontend was built as part of a MERN Stack learning project by a 3rd year CSE undergraduate student to practice real-world frontend development concepts and deployment workflows.
