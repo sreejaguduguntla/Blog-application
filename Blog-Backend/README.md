@@ -1,26 +1,122 @@
-#### Backedn Development ####
+# Blog Application Backend
 
-1. Create Git repo
-    git init 
+Backend API for a MERN Stack Blog Application built using Node.js, Express.js, MongoDB Atlas, JWT Authentication, and Cookie-based Authorization.
 
-2. Add .gitignore file => for github
+---
 
-3. Create .env files => for environment variables & read data from .env with 'dotenv' module
-    npm i dotenv
+## Features
 
-4. Generate package.json
-    npm init -y
+- User & Author Registration
+- Login & Logout Authentication
+- JWT Token Authentication
+- Cookie-based Authorization
+- Role-based Access Control
+- Create, Edit, Delete Articles
+- Add Comments to Articles
+- MongoDB Atlas Integration
+- REST APIs
+- Protected Routes
+- CORS Configuration
+- Deployed on Render
 
-5. create express app -> we can start using the http server
+---
 
-6. connect to database
+## Tech Stack
 
-7. Add middlewares (Body parser, err handling)
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- JWT
+- bcryptjs
+- cookie-parser
+- cors
+- dotenv
 
-8. Design Schema and create models
+---
 
-9. design REST APIs for all resources
+## Folder Structure
 
-#### Registrstion and Login
+Blog-Backend/
+│
+├── APIs/
+├── middlewares/
+├── models/
+├── services
+└── .env
 
-10. 
+
+## Installation
+
+Clone repository:
+
+git clone <backend-repo-url>
+
+Move into backend folder:
+
+cd Blog-Backend
+
+Install dependencies:
+
+npm install
+
+Run server:
+
+npm start
+
+Environment Variables
+
+Create .env file:
+
+PORT=4000
+
+MONGO_URI=your_mongodb_atlas_connection_string
+
+JWT_SECRET=your_secret_key
+
+CLIENT_URL=http://localhost:5173
+
+## For production:
+
+CLIENT_URL=https://your-frontend-url.vercel.app
+API Routes
+Common APIs
+POST /common-api/login
+GET  /common-api/logout
+GET  /common-api/check-auth
+User APIs
+POST /user-api/users
+GET  /user-api/articles
+PUT  /user-api/articles
+GET  /user-api/article/:id
+Author APIs
+POST   /author-api/users
+POST   /author-api/articles
+PUT    /author-api/articles
+PATCH  /author-api/articles/:id/status
+GET    /author-api/articles/:authorId
+Authentication
+
+Uses:
+
+JWT Tokens
+HTTP Only Cookies
+Cookie-based Session Persistence
+
+Cookie configuration:
+
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+});
+
+## Deployment
+
+Backend deployed using:
+
+Render
+
+Production URL:
+
+https://your-backend-url.onrender.com
