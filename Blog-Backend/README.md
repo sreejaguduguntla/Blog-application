@@ -1,27 +1,22 @@
-# Blog Application Backend
+# Blog App Backend
 
-Backend API for a MERN Stack Blog Application built using Node.js, Express.js, MongoDB Atlas, JWT Authentication, and Cookie-based Authorization.
+Backend for the Full Stack Blog Application built using Node.js, Express.js, MongoDB Atlas, and JWT Authentication.
 
----
+This backend provides:
 
-## Features
-
-- User & Author Registration
-- Login & Logout Authentication
-- JWT Token Authentication
-- Cookie-based Authorization
-- Role-based Access Control
-- Create, Edit, Delete Articles
-- Add Comments to Articles
-- MongoDB Atlas Integration
-- REST APIs
-- Protected Routes
-- CORS Configuration
-- Deployed on Render
+- Authentication APIs
+- User and Author APIs
+- JWT-based authorization
+- Cookie-based authentication
+- Article management APIs
+- Comment system APIs
+- Protected routes
+- MongoDB Atlas integration
+- REST API architecture
 
 ---
 
-## Tech Stack
+# Backend Tech Stack
 
 - Node.js
 - Express.js
@@ -35,39 +30,103 @@ Backend API for a MERN Stack Blog Application built using Node.js, Express.js, M
 
 ---
 
-## Folder Structure
+# Backend Development Process
 
+- Initialized Express server
+- Configured MongoDB Atlas connection
+- Organized backend folder structure
+- Created REST APIs
+- Added JWT authentication
+- Implemented cookie-based authorization
+- Added middleware protection
+- Implemented role-based access
+- Built article management APIs
+- Added comment system APIs
+- Configured CORS for frontend deployment
+- Configured production cookies
+- Deployed backend using Render
+
+---
+
+# Folder Structure
+
+```bash
 Blog-Backend/
-│
 ├── APIs/
 ├── middlewares/
 ├── models/
-├── services
-└── .env
+├── server.js
+├── package.json
+└── README.md
+```
 
+---
 
-## Installation
+# Main Features
 
-Clone repository:
+- User Registration
+- Author Registration
+- Login & Logout
+- JWT Authentication
+- Cookie-based Sessions
+- Protected APIs
+- Create/Edit/Delete Articles
+- Add Comments
+- Role-based Authorization
+- MongoDB Atlas Integration
 
-git clone <backend-repo-url>
+---
 
-Move into backend folder:
+# API Modules
 
-cd Blog-Backend
+## Common APIs
 
-Install dependencies:
+- Login API
+- Logout API
+- Check Authentication API
 
-npm install
+## User APIs
 
-Run server:
+- User Registration
+- Fetch Articles
+- Add Comments
+- View Single Article
 
-npm start
+## Author APIs
 
-Environment Variables
+- Author Registration
+- Create Article
+- Edit Article
+- Delete/Restore Article
+- Fetch Author Articles
 
-Create .env file:
+---
 
+# Authentication System
+
+Authentication is implemented using:
+
+- JWT Tokens
+- HTTP Only Cookies
+- Cookie-based session persistence
+
+Production cookie configuration:
+
+```js
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+});
+```
+
+---
+
+# Environment Variables
+
+Create a `.env` file:
+
+```env
 PORT=4000
 
 MONGO_URI=your_mongodb_atlas_connection_string
@@ -75,48 +134,73 @@ MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_secret_key
 
 CLIENT_URL=http://localhost:5173
+```
 
-## For production:
+Production:
 
+```env
 CLIENT_URL=https://your-frontend-url.vercel.app
-API Routes
-Common APIs
-POST /common-api/login
-GET  /common-api/logout
-GET  /common-api/check-auth
-User APIs
-POST /user-api/users
-GET  /user-api/articles
-PUT  /user-api/articles
-GET  /user-api/article/:id
-Author APIs
-POST   /author-api/users
-POST   /author-api/articles
-PUT    /author-api/articles
-PATCH  /author-api/articles/:id/status
-GET    /author-api/articles/:authorId
-Authentication
+```
 
-Uses:
+---
 
-JWT Tokens
-HTTP Only Cookies
-Cookie-based Session Persistence
+# How To Run Backend
 
-Cookie configuration:
+Install dependencies:
 
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-});
+```bash
+npm install
+```
 
-## Deployment
+Run backend server:
+
+```bash
+npm start
+```
+
+Backend runs on:
+
+```bash
+http://localhost:4000
+```
+
+---
+
+# Available Scripts
+
+```bash
+npm start
+npm run dev
+```
+
+---
+
+# Backend Deployment
 
 Backend deployed using:
 
-Render
+- Render
 
-Production URL:
+Database hosted on:
 
-https://your-backend-url.onrender.com
+- MongoDB Atlas
+
+---
+
+# What I Learned
+
+- Backend API architecture
+- REST API development
+- MongoDB Atlas integration
+- JWT Authentication
+- Cookie-based authorization
+- Middleware implementation
+- CORS handling
+- Backend deployment
+- Production authentication handling
+
+---
+
+# Backend Author Note
+
+This backend was built as part of a MERN Stack learning project by a 3rd year CSE undergraduate student to practice backend development, authentication systems, database integration, and cloud deployment workflows.
